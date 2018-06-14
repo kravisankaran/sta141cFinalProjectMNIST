@@ -20,7 +20,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_data, y, test_size = 0.15,
 from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 featSums = np.sum(X_train, axis = 0)
-sum(featSums == 0) * np.shape(featSums)[0]**-1 #68 features with zero (8.7%)
+sum(featSums == 0) * np.shape(featSums)[0]**-1 #68 features with zero only (8.7%)
 X_tr_scaled = sc.fit_transform(X_train)
 X_test_scaled = sc.fit_transform(X_test)
 
@@ -28,27 +28,18 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 from sklearn.metrics import confusion_matrix  
 from sklearn.metrics import accuracy_score
 
-testAccs = {}
-testConfs = {}
-trainAccs = {}
-trainConfs = {}
-for n in range(1, 12) :
-    lda = LDA(n_components = n)
-    lda = lda.fit(X_tr_scaled, y_train)
+#LDA using 9 linear discriminants for classification:    
+lda = LDA(n_components = 9)
+
+#Training set: Accuracy and confusion matrix
+train_labs = lda.predict(X_tr_scaled)
+trainConf = confusion_matrix(y_train, train_labs)
+train_acc = accuracy_score(y_train, train_labs)
     
-    #Training set: Accuracy and confusion matrix
-    train_labs = lda.predict(X_tr_scaled)
-    trainConf = confusion_matrix(y_train, train_labs)
-    train_acc = accuracy_score(y_train, train_labs)
-    trainAccs[n] = train_acc
-    trainConfs[n] = trainConf
-    
-    #Test set: Accuracy and confusion matrix
-    test_labs = lda.predict(X_test_scaled)
-    testConf = confusion_matrix(y_test, test_labs)
-    test_acc = accuracy_score(y_test, test_labs)
-    testAccs[n] = test_acc
-    testConfs[n] = testConf
+#Test set: Accuracy and confusion matrix
+test_labs = lda.predict(X_test_scaled)
+testConf = confusion_matrix(y_test, test_labs)
+test_acc = accuracy_score(y_test, test_labs)
 
 #For 2-dim visualization of LDA:
 lda = LDA(n_components = 2)
